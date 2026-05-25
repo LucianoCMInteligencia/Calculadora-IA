@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora IA Local</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Calculadora con IA Local</h1>
+
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+
+        <div class="buttons">
+            <button onclick="press('7')">7</button>
+            <button onclick="press('8')">8</button>
+            <button onclick="press('9')">9</button>
+            <button onclick="press('/')">/</button>
+
+            <button onclick="press('4')">4</button>
+            <button onclick="press('5')">5</button>
+            <button onclick="press('6')">6</button>
+            <button onclick="press('*')">*</button>
+
+            <button onclick="press('1')">1</button>
+            <button onclick="press('2')">2</button>
+            <button onclick="press('3')">3</button>
+            <button onclick="press('-')">-</button>
+
+            <button onclick="press('0')">0</button>
+            <button onclick="press('.')">.</button>
+            <button onclick="calculate()">=</button>
+            <button onclick="press('+')">+</button>
+
+            <button onclick="clearDisplay()" class="clear">C</button>
+        </div>
+    </div>
+
+    <div class="chat">
+        <h2>Chat con IA Local</h2>
+        <div id="chatLog"></div>
+
+        <div class="chat-actions">
+            <input type="text" id="userInput" placeholder="Escribe algo...">
+            <button onclick="sendMessage()" class="btn-send">Enviar</button>
+            <button onclick="nuevaConversacion()" class="btn-new-conversation">Nueva Conversación</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/finanzas.js"></script>
+<script src="js/ia.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
