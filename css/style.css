@@ -244,6 +244,23 @@ h1 {
     border-radius: 4px;
 }
 
+.chat-line-ia.streaming::after {
+    content: "▊";
+    animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.btn-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 @media (max-width: 900px) {
     .container {
         grid-template-columns: 1fr;
