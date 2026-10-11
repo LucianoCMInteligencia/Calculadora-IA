@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Pruebas - Calculadora IA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .test-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #00bcd4;
+            border-radius: 8px;
+            background: #0f3c3c;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .test-pass {
+            background: #1b5e20;
+            border-left: 4px solid #4caf50;
+        }
+        .test-fail {
+            background: #b71c1c;
+            border-left: 4px solid #f44336;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #00bcd4;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ff9800;
+            transform: translateY(-2px);
+        }
+        .console-output {
+            background: #000;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>🧪 Centro de Pruebas - Calculadora IA</h1>
+
+    <div class="test-section">
+        <h2>🎯 Pruebas Rápidas</h2>
+        <button onclick="runQuickTests()">▶️ Ejecutar Pruebas Rápidas</button>
+        <button onclick="testCopilot()">🤖 Probar Copilot</button>
+        <button onclick="clearConsole()">🗑️ Limpiar Consola</button>
+        <div id="quick-results" class="console-output" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Prueba Manual de IA Local</h2>
+        <input type="text" id="test-input" placeholder="Ej: 5+3, raíz de 16, sin 45" 
+               style="width: 100%; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+        <button onclick="runManualTest()">✅ Probar Entrada</button>
+        <div id="manual-results" class="console-output" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Modo Híbrido (Copilot + IA Local)</h2>
+        <input type="text" id="hybrid-input" placeholder="Ej: ¿Cuánto es 25% de 400?" 
+               style="width: 100%; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+        <button onclick="runHybridTest()">🔄 Probar Híbrido</button>
+        <div id="hybrid-results" class="console-output" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⚙️ Estado del Sistema</h2>
+        <button onclick="showSystemStatus()">📊 Ver Estado</button>
+        <div id="status-results" class="console-output" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📚 Documentación</h2>
+        <ul>
+            <li><a href="COPILOT_SETUP.md">📖 Guía de Configuración de Copilot</a></li>
+            <li><a href="README.md">📄 README Principal</a></li>
+            <li><a href="index.html">🏠 Volver a Calculadora</a></li>
+        </ul>
+    </div>
+</div>
+
+<script src="js/finanzas.js"></script>
+<script src="js/ia.js"></script>
+<script src="js/copilot.js"></script>
+<script src="js/app.js"></script>
+<script src="js/config.js"></script>
+<script src="js/pruebas.js"></script>
+
+<script>
+function log(message, isError = false) {
+    const consoles = document.querySelectorAll('.console-output');
+    if (consoles.length > 0) {
+        const target = event.target.closest('.test-section').querySelector('.console-output');
+        if (target) {
+            const time = new Date().toLocaleTimeString();
+            const prefix = isError ? '❌' : '✅';
+            target.innerHTML += `[${time}] ${prefix} ${message}\n`;
+            target.scrollTop = target.scrollHeight;
+        }
+    }
+}
+
+function runQuickTests() {
+    const resultsDiv = document.getElementById('quick-results');
+    resultsDiv.innerHTML = '🚀 Ejecutando pruebas...\n';
+
+    const tests = [
+        { input: '5+3', tipo: 'aritmetica' },
+        { input: 'raíz de 16', tipo: 'cientifica' },
+        { input: 'sin 45', tipo: 'cientifica' },
+        { input: 'factorial 5', tipo: 'cientifica' }
+    ];
+
+    let passed = 0;
+    let failed = 0;
+
+    tests.forEach((test, i) => {
+        try {
+            const resultado = interpretarFrase(test.input);
+            if (resultado.tipo === test.tipo) {
+                resultsDiv.innerHTML += `✅ Test ${i+1}: "${test.input}" → ${resultado.tipo}\n`;
+                passed++;
+            } else {
+                resultsDiv.innerHTML += `❌ Test ${i+1}: "${test.input}" esperaba ${test.tipo}, obtuvo ${resultado.tipo}\n`;
+                failed++;
+            }
+        } catch (e) {
+            resultsDiv.innerHTML += `❌ Test ${i+1}: Error: ${e.message}\n`;
+            failed++;
+        }
+    });
+
+    resultsDiv.innerHTML += `\n📊 Resultados: ${passed} pasadas, ${failed} fallidas`;
+}
+
+function runManualTest() {
+    const input = document.getElementById('test-input').value;
+    if (!input) {
+        alert('Ingresa algo para probar');
+        return;
+    }
+
+    const resultsDiv = document.getElementById('manual-results');
+    resultsDiv.innerHTML = '';
+
+    try {
+        const resultado = interpretarFrase(input);
+        resultsDiv.innerHTML += `Entrada: ${input}\n`;
+        resultsDiv.innerHTML += `Tipo detectado: ${resultado.tipo}\n`;
+        resultsDiv.innerHTML += `Datos: ${JSON.stringify(resultado, null, 2)}\n\n`;
+
+        const respuesta = manejarOperacionDesdeIA(resultado);
+        resultsDiv.innerHTML += `✅ Respuesta: ${respuesta}`;
+    } catch (e) {
+        resultsDiv.innerHTML = `❌ Error: ${e.message}`;
+    }
+}
+
+function runHybridTest() {
+    const input = document.getElementById('hybrid-input').value;
+    if (!input) {
+        alert('Ingresa algo para probar');
+        return;
+    }
+
+    const resultsDiv = document.getElementById('hybrid-results');
+    resultsDiv.innerHTML = '⏳ Procesando...\n';
+
+    Copilot.procesarHibrido(input).then(resultado => {
+        resultsDiv.innerHTML = '';
+        resultsDiv.innerHTML += `Entrada: ${input}\n`;
+        resultsDiv.innerHTML += `Fuente: ${resultado.fuente}\n`;
+        resultsDiv.innerHTML += `✅ Respuesta: ${resultado.respuesta}`;
+    }).catch(e => {
+        resultsDiv.innerHTML = `❌ Error: ${e.message}`;
+    });
+}
+
+function testCopilot() {
+    const resultsDiv = document.getElementById('quick-results');
+    resultsDiv.innerHTML = '';
+
+    const estado = Copilot.estado();
+    resultsDiv.innerHTML += `Estado de Copilot:\n`;
+    resultsDiv.innerHTML += `${estado.configurado ? '✅' : '❌'} Configurado: ${estado.configurado}\n`;
+    resultsDiv.innerHTML += `${estado.habilitado ? '✅' : '❌'} Habilitado: ${estado.habilitado}\n`;
+    resultsDiv.innerHTML += `📍 Endpoint: ${estado.endpoint}\n`;
+    resultsDiv.innerHTML += `🤖 Modelo: ${estado.modelo}`;
+}
+
+function showSystemStatus() {
+    const resultsDiv = document.getElementById('status-results');
+    resultsDiv.innerHTML = '';
+
+    const copilotStatus = Copilot.estado();
+    resultsDiv.innerHTML += `=== ESTADO DEL SISTEMA ===\n\n`;
+    resultsDiv.innerHTML += `Navegador: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n`;
+    resultsDiv.innerHTML += `Zona Horaria: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n`;
+    resultsDiv.innerHTML += `Hora: ${new Date().toLocaleString()}\n\n`;
+    resultsDiv.innerHTML += `=== COPILOT ===\n`;
+    resultsDiv.innerHTML += `Configurado: ${copilotStatus.configurado ? '✅ Sí' : '❌ No'}\n`;
+    resultsDiv.innerHTML += `Habilitado: ${copilotStatus.habilitado ? '✅ Sí' : '❌ No'}\n`;
+    resultsDiv.innerHTML += `Modelo: ${copilotStatus.modelo}\n\n`;
+    resultsDiv.innerHTML += `=== IA LOCAL ===\n`;
+    resultsDiv.innerHTML += `Estado: ✅ Activa\n`;
+    resultsDiv.innerHTML += `Tipo: interpretarFrase() + manejarOperacionDesdeIA()`;
+}
+
+function clearConsole() {
+    document.querySelectorAll('.console-output').forEach(el => {
+        el.innerHTML = '';
+    });
+}
+
+// Mostrar estado inicial
+window.addEventListener('load', () => {
+    showSystemStatus();
+});
+</script>
+
+</body>
+</html>

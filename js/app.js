@@ -9,46 +9,126 @@ function clearDisplay() {
 function calculate() {
     try {
         let expr = document.getElementById("display").value;
-        // Evitar eval con expresiones inválidas
-        if (!expr || expr.match(/[a-zA-Z]/)) {
+        
+        // Validar que no esté vacía
+        if (!expr || expr.trim() === "") {
+            document.getElementById("display").value = "Error: vacío";
             return "Error";
         }
+        
+        // Validar que no contenga caracteres prohibidos
+        if (expr.match(/[a-zA-Z_]/)) {
+            document.getElementById("display").value = "Error: caracteres inválidos";
+            return "Error";
+        }
+        
+        // Validar estructura básica
+        if (!validarExpresion(expr)) {
+            document.getElementById("display").value = "Error: formato inválido";
+            return "Error";
+        }
+        
+        // Prevenir división por cero
+        if (expr.match(/\/\s*0\b/)) {
+            document.getElementById("display").value = "Error: división por cero";
+            return "Error";
+        }
+        
         let result = eval(expr);
+        
+        // Validar resultado
+        if (!isFinite(result)) {
+            document.getElementById("display").value = "Error: resultado inválido";
+            return "Error";
+        }
+        
+        // Limitar decimales
+        if (typeof result === "number") {
+            result = Math.round(result * 1000000) / 1000000;
+        }
+        
         document.getElementById("display").value = result;
         return result;
-    } catch {
-        document.getElementById("display").value = "Error";
+    } catch (error) {
+        document.getElementById("display").value = "Error: " + error.message;
         return "Error";
     }
 }
 
-function sendMessage() {
+let conversationId = 0;
+
+async function sendMessage() {
     let input = document.getElementById("userInput").value;
     if (!input.trim()) return;
 
     addChat("Tú: " + input, "user");
-
-    // Interpretar frase con la IA local
-    let interpreted = interpretarFrase(input);
-
-    // Conectar IA → calculadora
-    let respuesta = manejarOperacionDesdeIA(interpreted);
-
-    addChat("IA: " + respuesta, "ia");
-
     document.getElementById("userInput").value = "";
+    const message = addChat("IA: ...", "ia");
+    const currentConversation = conversationId;
+
+    try {
+        const result = typeof Copilot !== "undefined"
+            ? await Copilot.procesarHibrido(input)
+            : { respuesta: manejarOperacionDesdeIA(interpretarFrase(input)), fuente: "IA Local" };
+
+        if (currentConversation === conversationId) {
+            const aviso = result.aviso ? result.aviso + " " : "";
+            message.textContent = "IA: " + aviso + result.respuesta;
+        }
+    } catch (error) {
+        if (currentConversation === conversationId) {
+            message.textContent = "IA: Lo siento, no pude procesar tu solicitud. " + error.message;
+        }
+    }
 }
 
 function manejarOperacionDesdeIA(data) {
-    // Aritmética: pintar expresión en la calculadora y ejecutar
-    if (data.tipo === "aritmetica") {
-        document.getElementById("display").value = data.expresion;
-        let resultado = calculate();
-        return data.expresion + " = " + resultado;
-    }
+    try {
+        // Manejo de errores
+        if (data.tipo === "error") {
+            return "Todavía no entiendo esa petición en modo local. Prueba con «suma 5 a 3», «raíz cuadrada de 16» o «¿qué puedes hacer?».";
+        }
 
-    // Científica: mostrar operación simbólica en display
-    if (data.tipo === "cientifica") {
+        if (data.tipo === "conversacional") {
+            return data.respuesta || "¡Hola! ¿En qué cálculo puedo ayudarte?";
+        }
+
+        // Aritmética: pintar expresión en la calculadora y ejecutar
+        if (data.tipo === "aritmetica") {
+            if (!data.expresion) {
+                return "Error: expresión vacía";
+            }
+            
+            document.getElementById("display").value = data.expresion;
+            let resultado = calculate();
+            
+            if (resultado === "Error") {
+                return "No pude calcular la expresión: " + data.expresion;
+            }
+            
+            return data.expresion + " = " + resultado;
+        }
+
+        // Científica: mostrar operación simbólica en display
+        if (data.tipo === "cientifica") {
+            return ejecutarOperacionCientifica(data);
+        }
+
+        // Financieras: usar módulo finanzas y mostrar resultado
+        if (data.tipo === "financiera") {
+            let res = ejecutarFinanciera(data);
+            document.getElementById("display").value = res;
+            return res;
+        }
+
+        return "No entendí la instrucción. Intenta: '5+3', 'raíz de 16', '20% de 100'";
+    } catch (error) {
+        return "Error al procesar: " + error.message;
+    }
+}
+
+function ejecutarOperacionCientifica(data) {
+    try {
         let exprTexto = "";
         let valor = data.valor;
 
@@ -56,35 +136,78 @@ function manejarOperacionDesdeIA(data) {
             exprTexto = "sin(" + valor + "°)";
             document.getElementById("display").value = exprTexto;
             let res = Math.sin(valor * Math.PI / 180);
-            document.getElementById("display").value = res;
-            return exprTexto + " = " + res;
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
         }
 
         if (data.op === "cos") {
             exprTexto = "cos(" + valor + "°)";
             document.getElementById("display").value = exprTexto;
             let res = Math.cos(valor * Math.PI / 180);
-            document.getElementById("display").value = res;
-            return exprTexto + " = " + res;
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
         }
 
         if (data.op === "log") {
+            if (valor <= 0) return "Error: logaritmo de número negativo o cero";
             exprTexto = "log10(" + valor + ")";
             document.getElementById("display").value = exprTexto;
             let res = Math.log10(valor);
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
+        }
+
+        if (data.op === "sqrt") {
+            if (valor < 0) return "Error: raíz cuadrada de número negativo";
+            exprTexto = "√" + valor;
+            document.getElementById("display").value = exprTexto;
+            let res = Math.sqrt(valor);
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
+        }
+
+        if (data.op === "cbrt") {
+            exprTexto = "∛" + valor;
+            document.getElementById("display").value = exprTexto;
+            let res = Math.cbrt(valor);
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
+        }
+
+        if (data.op === "pow") {
+            exprTexto = data.base + "^" + data.exponente;
+            document.getElementById("display").value = exprTexto;
+            let res = Math.pow(data.base, data.exponente);
+            if (!isFinite(res)) return "Error: resultado no válido";
+            document.getElementById("display").value = res.toFixed(6);
+            return exprTexto + " = " + res.toFixed(6);
+        }
+
+        if (data.op === "porcentaje") {
+            exprTexto = data.porcentaje + "% de " + data.cantidad;
+            document.getElementById("display").value = exprTexto;
+            let res = (data.cantidad * data.porcentaje) / 100;
+            document.getElementById("display").value = res.toFixed(2);
+            return exprTexto + " = " + res.toFixed(2);
+        }
+
+        if (data.op === "factorial") {
+            if (data.valor < 0 || !Number.isInteger(data.valor)) return "Error: factorial inválido";
+            if (data.valor > 170) return "Error: número muy grande";
+            exprTexto = data.valor + "!";
+            document.getElementById("display").value = exprTexto;
+            let res = 1;
+            for (let i = 2; i <= data.valor; i++) {
+                res *= i;
+            }
             document.getElementById("display").value = res;
             return exprTexto + " = " + res;
         }
-    }
 
-    // Financieras: usar módulo finanzas y mostrar resultado
-    if (data.tipo === "financiera") {
-        let res = ejecutarFinanciera(data);
-        document.getElementById("display").value = res;
-        return res;
+        return "Operación científica no reconocida";
+    } catch (error) {
+        return "Error en operación científica: " + error.message;
     }
-
-    return "No entendí la instrucción";
 }
 
 function addChat(text, who) {
@@ -94,9 +217,14 @@ function addChat(text, who) {
     div.className = (who === "user") ? "chat-line-user" : "chat-line-ia";
     log.appendChild(div);
     log.scrollTop = log.scrollHeight;
+    return div;
 }
 
 function nuevaConversacion() {
+    conversationId++;
+    if (typeof Copilot !== "undefined") {
+        Copilot.limpiarConversacion();
+    }
     document.getElementById("chatLog").innerHTML = "";
     document.getElementById("userInput").value = "";
     document.getElementById("display").value = "";

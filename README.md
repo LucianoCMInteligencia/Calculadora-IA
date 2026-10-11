@@ -2,7 +2,21 @@
 
 Una calculadora moderna con interfaz de chat impulsada por IA local. Combina funcionalidades de cálculo aritmético, científico y financiero en una aplicación web responsive.
 
-## 🌟 Características
+## � **¡NUEVO! Integración con Copilot de Microsoft**
+
+Ahora puedes vincular tu calculadora con **Azure OpenAI (Copilot)** para obtener respuestas más inteligentes y precisas.
+
+### ✨ Ventajas de Copilot:
+- 🤖 IA más poderosa y sofisticada
+- 📚 Mejor comprensión del lenguaje natural
+- 🎓 Explicaciones detalladas de cálculos
+- 🔄 Modo híbrido: Copilot + IA Local
+
+👉 **[Ver guía de configuración →](COPILOT_SETUP.md)**
+
+---
+
+## �🌟 Características
 
 - **Calculadora Aritmética**: Operaciones básicas (+, -, *, /)
 - **Cálculos Científicos**: Funciones trigonométricas (sin, cos) y logarítmicas
@@ -10,6 +24,20 @@ Una calculadora moderna con interfaz de chat impulsada por IA local. Combina fun
 - **Chat con IA Local**: Interfaz conversacional para realizar operaciones
 - **Diseño Futurista**: Tema cian/naranja con efectos visuales avanzados
 - **Responsive**: Adaptado perfectamente para desktop, tablet y móvil
+
+## 🚀 **Últimas Optimizaciones (v2.0)**
+
+### ✅ Mejoras de IA
+- Parser de frases mejorado con mejor detección de patrones
+- Soporte para números decimales en todas las operaciones
+- Validación robusta de expresiones matemáticas
+- Manejo inteligente de errores (división por cero, raíces negativas, etc.)
+
+### ✅ Mejoras de Seguridad
+- Prevención de inyección de código
+- Validación de todas las expresiones antes de ejecutarlas
+- Límites para operaciones extremas (factorial > 170)
+- Detección de resultados inválidos (infinito, NaN)
 
 ## 🎯 Interfaz
 
@@ -37,6 +65,13 @@ La aplicación cuenta con:
 - "Raíz cuadrada de 16"
 - "Interés compuesto de 1000"
 - "Calcula sin(45)"
+
+### 🧪 Pruebas y Validación
+Abre `test.html` para acceder al centro de pruebas con:
+- ✓ Pruebas automáticas
+- ✓ Pruebas manuales
+- ✓ Verificación de Copilot
+- ✓ Estado del sistema
 
 ## 📁 Estructura del Proyecto
 
