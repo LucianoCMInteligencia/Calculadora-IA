@@ -72,7 +72,46 @@ test("existing scientific and multiplication phrases remain recognized", () => {
     assert.equal(context.interpretarFrase("sin 45").op, "sin");
     assert.equal(context.interpretarFrase("25 porciento de 100").porcentaje, 25);
     assert.equal(context.interpretarFrase("5 elevado a 3").exponente, 3);
+    assert.equal(context.interpretarFrase("-2 elevado a 3").base, -2);
     assert.equal(context.interpretarFrase("10 multiplicar 5").expresion, "10*5");
+});
+
+test("percentage and follow-up operations are evaluated as one ordered expression", () => {
+    const parsed = context.interpretarFrase("suma 5 al 50% de 120000 restando 12000");
+    assert.equal(parsed.tipo, "aritmetica");
+    assert.equal(context.manejarOperacionDesdeIA(parsed).endsWith("= 48005"), true);
+
+    const withWords = context.interpretarFrase("suma 5 al 50 por ciento de 120.000,50 y resta 12.000");
+    assert.equal(context.manejarOperacionDesdeIA(withWords).endsWith("= 48005.25"), true);
+});
+
+test("arithmetic evaluator applies precedence, unary signs, and exact zero division checks", () => {
+    display.value = "2+3*4";
+    assert.equal(context.calculate(), 14);
+    display.value = "-2+(3*4)";
+    assert.equal(context.calculate(), 10);
+    display.value = "10/0.5";
+    assert.equal(context.calculate(), 20);
+    display.value = "10/(2-2)";
+    assert.equal(context.calculate(), "Error");
+    assert.match(display.value, /división por cero/);
+    display.value = "15234567+2135648";
+    assert.equal(context.calculate(), 17370215);
+    display.value = "12345678912345+1";
+    assert.equal(context.calculate(), 12345678912346);
+    display.value = "alert(1)";
+    assert.equal(context.calculate(), "Error");
+    display.value = "1+)";
+    assert.equal(context.calculate(), "Error");
+});
+
+test("scientific operations preserve negative arguments and reject invalid domains", () => {
+    assert.equal(context.interpretarFrase("sin -30").valor, -30);
+    assert.equal(context.interpretarFrase("raíz cuadrada de -4").valor, -4);
+    assert.equal(context.interpretarFrase("log de -10").valor, -10);
+    assert.equal(context.interpretarFrase("factorial de -5").valor, -5);
+    assert.match(context.manejarOperacionDesdeIA(context.interpretarFrase("raíz cuadrada de -4")), /número negativo/);
+    assert.match(context.manejarOperacionDesdeIA(context.interpretarFrase("factorial de -5")), /factorial inválido/);
 });
 
 test("recognized calculations stay exact while Copilot is enabled", async () => {

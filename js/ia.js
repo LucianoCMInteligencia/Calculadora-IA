@@ -21,7 +21,10 @@ function interpretarFrase(frase) {
     frase = frase
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[¿?¡!,.;:]/g, " ")
+        .replace(/[¿?¡!;:]/g, " ")
+        .replace(/[,.]/g, function(separator, index, text) {
+            return /\d/.test(text[index - 1] || "") && /\d/.test(text[index + 1] || "") ? separator : " ";
+        })
         .replace(/\s+/g, " ")
         .trim();
 
@@ -65,6 +68,13 @@ function interpretarFrase(frase) {
 
     // Limpiar símbolos monetarios
     frase = frase.replace(/[€$£¥]/g, " ");
+    frase = frase.replace(/\b(\d{1,3}(?:\.\d{3})+)(?:,(\d+))?\b/g, function(_, entero, decimales) {
+        return entero.replace(/\./g, "") + (decimales ? "." + decimales : "");
+    });
+    frase = frase.replace(/\b(\d{1,3}(?:[ \u00a0\u202f]\d{3})+)\b/g, function(_, entero) {
+        return entero.replace(/[ \u00a0\u202f]/g, "");
+    });
+    frase = frase.replace(/(\d),(\d)/g, "$1.$2");
 
     // Diccionario de números escritos en español
     const numeros = {
@@ -84,13 +94,15 @@ function interpretarFrase(frase) {
         return (decVal + uniVal).toString();
     });
 
+    frase = frase.replace(/\bpor\s+ciento\b/g, " porciento ");
+
     // Reemplazar números escritos por dígitos
     for (let palabra in numeros) {
         frase = frase.replace(new RegExp("\\b" + palabra + "\\b", "g"), numeros[palabra]);
     }
 
     // Operaciones científicas que admite la calculadora.
-    const valorCientifico = "(\\d+(?:\\.\\d+)?)";
+    const valorCientifico = "(-?\\d+(?:\\.\\d+)?)";
     const trigonometria = frase.match(new RegExp("\\b(sin|seno|cos|coseno)\\s*(?:de\\s*)?" + valorCientifico + "\\b"));
     if (trigonometria) {
         return {
@@ -104,8 +116,9 @@ function interpretarFrase(frase) {
         return { tipo: "cientifica", op: "log", valor: parseFloat(logaritmo[1]) };
     }
 
-    // Porcentajes expresados como "25% de 100" o "25 por ciento de 100".
-    const porcentaje = frase.match(new RegExp("\\b" + valorCientifico + "\\s*(?:%|por\\s*ciento|porciento)\\s*(?:de\\s*)?" + valorCientifico + "\\b"));
+    // Los porcentajes pueden ser una petición aislada o parte de una operación encadenada.
+    const patronPorcentaje = new RegExp("\\b" + valorCientifico + "\\s*(?:%|por\\s*ciento|porciento)\\s*(?:de\\s*)?" + valorCientifico + "\\b", "g");
+    const porcentaje = frase.match(new RegExp("^\\s*" + valorCientifico + "\\s*(?:%|por\\s*ciento|porciento)\\s*(?:de\\s*)?" + valorCientifico + "\\s*$"));
     if (porcentaje) {
         return {
             tipo: "cientifica",
@@ -114,6 +127,7 @@ function interpretarFrase(frase) {
             cantidad: parseFloat(porcentaje[2])
         };
     }
+    frase = frase.replace(patronPorcentaje, "($1*$2/100)");
 
     // Resolve imperative addition/subtraction before generic word cleanup.
     // For example, "suma X a Y" means X + Y, not an unknown use of "a".
@@ -139,7 +153,7 @@ function interpretarFrase(frase) {
     // OPERACIONES MATEMÁTICAS AVANZADAS (ANTES de eliminar palabras basura)
     // Raíz cuadrada: "raíz cuadrada de X", "sqrt X"
     if (frase.match(/\b(raiz|raíz)\s+(cuadrada|cuadrado)(\s+de)?\b/) || frase.match(/\bsqrt\b/)) {
-        let nums = frase.match(/\d+(\.\d+)?/g);
+        let nums = frase.match(/-?\d+(?:\.\d+)?/g);
         if (nums && nums.length >= 1) {
             return {
                 tipo: "cientifica",
@@ -151,7 +165,7 @@ function interpretarFrase(frase) {
 
     // Raíz cúbica: "raíz cúbica de X"
     if (frase.match(/\b(raiz|raíz)\s+(cubica|cúbica|cubo)(\s+de)?\b/)) {
-        let nums = frase.match(/\d+(\.\d+)?/g);
+        let nums = frase.match(/-?\d+(?:\.\d+)?/g);
         if (nums && nums.length >= 1) {
             return {
                 tipo: "cientifica",
@@ -161,51 +175,37 @@ function interpretarFrase(frase) {
         }
     }
 
-    // Potencia: "X elevado a Y" o "X a la Y" o "X^Y"
-    if (frase.match(/(\d+)\s+elevado\s+a\s+(\d+)/) || frase.match(/(\d+)\s+a la\s+(\d+)/) || frase.match(/(\d+)\^(\d+)/)) {
-        let nums = frase.match(/\d+/g);
-        if (nums && nums.length >= 2) {
-            return {
-                tipo: "cientifica",
-                op: "pow",
-                base: parseFloat(nums[0]),
-                exponente: parseFloat(nums[1])
-            };
-        }
-    }
-
-    // Porcentaje: "X% de Y" o "porcentaje de X en Y"
-    if (frase.match(/(\d+(\.\d+)?)\s*%/) || frase.match(/\bporcentaje\b/)) {
-        let nums = frase.match(/\d+(\.\d+)?/g);
-        if (nums && nums.length >= 2) {
-            return {
-                tipo: "cientifica",
-                op: "porcentaje",
-                cantidad: parseFloat(nums[1]),
-                porcentaje: parseFloat(nums[0])
-            };
-        }
+    // Potencia: "X elevado a Y", "X a la Y" o "X^Y".
+    const potencia = frase.match(/(-?\d+(?:\.\d+)?)\s+(?:elevado\s+a|a la)\s+(-?\d+(?:\.\d+)?)|(-?\d+(?:\.\d+)?)\^(-?\d+(?:\.\d+)?)/);
+    if (potencia) {
+        return {
+            tipo: "cientifica",
+            op: "pow",
+            base: parseFloat(potencia[1] || potencia[3]),
+            exponente: parseFloat(potencia[2] || potencia[4])
+        };
     }
 
     // Factorial: "factorial de X" o "X!"
     if (frase.match(/\b(factorial)\b/) || frase.match(/\d+!/)) {
-        let nums = frase.match(/\d+/g);
+        let nums = frase.match(/-?\d+(?:\.\d+)?/g);
         if (nums && nums.length >= 1) {
             return {
                 tipo: "cientifica",
                 op: "factorial",
-                valor: parseInt(nums[nums.length - 1])
+                valor: parseFloat(nums[nums.length - 1])
             };
         }
     }
 
     // Reemplazar operadores de palabras sueltas
-    frase = frase.replace(/\bsuma\b|\bsumar\b/g, "+")
-                 .replace(/\bmas\b|\bmás\b/g, "+")
-                 .replace(/\bresta\b|\brestar\b/g, "-")
+    frase = frase.replace(/\b(suma|sumar|sumando|sumale|sumarle|agrega|agregar|agregando|anade|anadir|anadiendo)\b/g, "+")
+                 .replace(/\b(mas|más|y|al)\b/g, "+")
+                 .replace(/\b(resta|restar|restando|quita|quitar|quitando)\b/g, "-")
                  .replace(/\bmenos\b/g, "-")
+                 .replace(/\b(multiplica|multiplicar|multiplicando)\b/g, "*")
                  .replace(/\bpor\b/g, "*")
-                 .replace(/\b(divide|dividir)\b/g, "/")
+                 .replace(/\b(divide|dividir|dividiendo)\b/g, "/")
                  .replace(/\bentre\b/g, "/");
 
     // Palabras irrelevantes (DESPUÉS de extraer números y operadores)
@@ -214,7 +214,8 @@ function interpretarFrase(frase) {
         "por favor", "la", "el", "de", "una", "un", "me", "que",
         "cuyo", "cuyos", "cuyas", "precio", "son", "gravado", "con",
         "cuanto", "cuanta", "cuantos", "cuantas", "resultado", "resutado", "resulta",
-        "es", "da", "porfavor", "puedes", "podrias", "haz", "operacion"
+        "es", "da", "porfavor", "puedes", "podrias", "haz", "operacion",
+        "del", "final", "inicial", "despues", "luego"
     ];
 
     basura.forEach(b => {
@@ -226,9 +227,6 @@ function interpretarFrase(frase) {
 
     // Limpiar y validar expresión
     frase = limpiarExpresion(frase);
-
-    // Remover operador al inicio si existe
-    frase = frase.replace(/^[\+\-\*\/]+/, "").trim();
 
     // Validar que la expresión sea segura
     if (!validarExpresion(frase) || !frase) {

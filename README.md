@@ -22,6 +22,7 @@ Ahora puedes vincular tu calculadora con **Azure OpenAI (Copilot)** para obtener
 - **Cálculos Científicos**: Funciones trigonométricas (sin, cos) y logarítmicas
 - **Herramientas Financieras**: Cálculos de interés compuesto y análisis financiero
 - **Chat con IA Local**: Interfaz conversacional para realizar operaciones
+- **Porcentajes compuestos**: Combina porcentajes con sumas y restas en una misma frase
 - **Diseño Futurista**: Tema cian/naranja con efectos visuales avanzados
 - **Responsive**: Adaptado perfectamente para desktop, tablet y móvil
 

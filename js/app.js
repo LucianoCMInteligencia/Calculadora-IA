@@ -8,7 +8,7 @@ function clearDisplay() {
 
 function calculate() {
     try {
-        let expr = document.getElementById("display").value;
+        const expr = document.getElementById("display").value;
         
         // Validar que no esté vacía
         if (!expr || expr.trim() === "") {
@@ -16,43 +16,85 @@ function calculate() {
             return "Error";
         }
         
-        // Validar que no contenga caracteres prohibidos
-        if (expr.match(/[a-zA-Z_]/)) {
-            document.getElementById("display").value = "Error: caracteres inválidos";
-            return "Error";
-        }
-        
-        // Validar estructura básica
+        // Validar estructura y calcular sin ejecutar código arbitrario.
         if (!validarExpresion(expr)) {
             document.getElementById("display").value = "Error: formato inválido";
             return "Error";
         }
         
-        // Prevenir división por cero
-        if (expr.match(/\/\s*0\b/)) {
-            document.getElementById("display").value = "Error: división por cero";
-            return "Error";
-        }
-        
-        let result = eval(expr);
-        
-        // Validar resultado
-        if (!isFinite(result)) {
+        const result = evaluarExpresion(expr);
+        if (!Number.isFinite(result)) {
             document.getElementById("display").value = "Error: resultado inválido";
             return "Error";
         }
         
-        // Limitar decimales
-        if (typeof result === "number") {
-            result = Math.round(result * 1000000) / 1000000;
-        }
-        
-        document.getElementById("display").value = result;
-        return result;
+        const roundedResult = Number(result.toFixed(8));
+        document.getElementById("display").value = roundedResult;
+        return roundedResult;
     } catch (error) {
-        document.getElementById("display").value = "Error: " + error.message;
+        document.getElementById("display").value = error.message;
         return "Error";
     }
+}
+
+function evaluarExpresion(expr) {
+    const tokens = expr.match(/\d+(?:\.\d+)?|[()+\-*/]/g) || [];
+    if (tokens.join("") !== expr.replace(/\s+/g, "")) {
+        throw new Error("Error: formato inválido");
+    }
+
+    let position = 0;
+
+    function parsePrimary() {
+        const token = tokens[position++];
+        if (token === "+" || token === "-") {
+            const value = parsePrimary();
+            return token === "-" ? -value : value;
+        }
+        if (token === "(") {
+            const value = parseSum();
+            if (tokens[position++] !== ")") {
+                throw new Error("Error: faltan paréntesis");
+            }
+            return value;
+        }
+        if (!token || !/^\d+(?:\.\d+)?$/.test(token)) {
+            throw new Error("Error: formato inválido");
+        }
+        return Number(token);
+    }
+
+    function parseProduct() {
+        let value = parsePrimary();
+        while (tokens[position] === "*" || tokens[position] === "/") {
+            const operator = tokens[position++];
+            const right = parsePrimary();
+            if (operator === "/" && right === 0) {
+                throw new Error("Error: división por cero");
+            }
+            value = operator === "*" ? value * right : value / right;
+        }
+        return value;
+    }
+
+    function parseSum() {
+        let value = parseProduct();
+        while (tokens[position] === "+" || tokens[position] === "-") {
+            const operator = tokens[position++];
+            const right = parseProduct();
+            value = operator === "+" ? value + right : value - right;
+        }
+        return value;
+    }
+
+    if (!tokens.length) {
+        throw new Error("Error: expresión vacía");
+    }
+    const result = parseSum();
+    if (position !== tokens.length) {
+        throw new Error(tokens[position] === ")" ? "Error: paréntesis sin apertura" : "Error: formato inválido");
+    }
+    return result;
 }
 
 let conversationId = 0;
