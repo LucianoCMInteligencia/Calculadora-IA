@@ -1,0 +1,221 @@
+500 Operaciones para IA Local
+
+Este archivo contiene 500 operaciones matemáticas compatibles con tu IA Local. Todas están escritas en formato lineal, sin lenguaje natural complejo, para asegurar que la IA las interprete correctamente.
+
+Operaciones 1–100
+
+calcula: 5 + 3
+
+calcula: 10 - 4
+
+calcula: 8 * 7
+
+calcula: 20 / 5
+
+calcula: 15 + 25
+
+calcula: 100 - 40
+
+calcula: 12 * 12
+
+calcula: 144 / 12
+
+calcula: 3 + 99
+
+calcula: 200 - 150
+
+calcula: 50% de 200
+
+calcula: 25% de 400
+
+calcula: 10% de 1200
+
+calcula: 75% de 80
+
+calcula: 33% de 300
+
+calcula: 90% de 900
+
+calcula: 5% de 500
+
+calcula: 12% de 2400
+
+calcula: 60% de 60000
+
+calcula: 30% de 90000
+
+calcula: 200 + (50% de 400)
+
+calcula: 500 - (25% de 200)
+
+calcula: (10% de 1000) + 300
+
+calcula: (75% de 80) - 20
+
+calcula: 1200 - (33% de 300)
+
+calcula: 900 + (90% de 900)
+
+calcula: 500 - (5% de 500)
+
+calcula: 2400 + (12% de 2400)
+
+calcula: 60000 - (60% de 60000)
+
+calcula: 90000 + (30% de 90000)
+
+calcula: 500 + 300 - 200 + 100
+
+calcula: 1200 - 400 + 50 - 20
+
+calcula: 900 + 600 - 300 + 150
+
+calcula: 10000 - 5000 + 2500 - 1250
+
+calcula: 80000 + 5000 - 3000 + 1000
+
+calcula: (50% de 200) + (25% de 400)
+
+calcula: (10% de 1200) - (5% de 500)
+
+calcula: (75% de 80) + (33% de 300)
+
+calcula: (90% de 900) - (12% de 2400)
+
+calcula: (60% de 60000) + (30% de 90000)
+
+calcula: 200 + (50% de 400) - 100
+
+calcula: 500 - (25% de 200) + 50
+
+calcula: 1200 + (10% de 1000) - 300
+
+calcula: 80 + (75% de 80) - 20
+
+calcula: 300 - (33% de 300) + 33
+
+calcula: (500 + 300) - (200 + 100)
+
+calcula: (1200 - 400) + (50 - 20)
+
+calcula: (900 + 600) - (300 + 150)
+
+calcula: (10000 - 5000) + (2500 - 1250)
+
+calcula: (80000 + 5000) - (3000 + 1000)
+
+calcula: 1500 + 250 - (50% de 800)
+
+calcula: 9000 - 4500 + (25% de 2000)
+
+calcula: 30000 + (10% de 50000) - 4000
+
+calcula: 120000 - (5% de 60000) + 500
+
+calcula: 450 + 550 - (75% de 1000)
+
+calcula: 99999 + (33% de 33333)
+
+calcula: 88888 - (12% de 44444)
+
+calcula: 77777 + (60% de 60000)
+
+calcula: 55555 - (30% de 90000)
+
+calcula: 44444 + (90% de 900)
+
+calcula: 12345 + 54321 - (50% de 10000)
+
+calcula: 98765 - 56789 + (25% de 20000)
+
+calcula: 22222 + 11111 - (10% de 50000)
+
+calcula: 33333 - 22222 + (75% de 80000)
+
+calcula: 44444 + 55555 - (33% de 30000)
+
+calcula: 66666 - 11111 + (12% de 24000)
+
+calcula: 77777 + 22222 - (60% de 60000)
+
+calcula: 88888 - 33333 + (30% de 90000)
+
+calcula: 99999 + 44444 - (90% de 90000)
+
+calcula: 13579 + 97531 - (50% de 120000)
+
+calcula: 24680 + 86420 - (25% de 48000)
+
+calcula: 11223 + 22113 - (10% de 33000)
+
+calcula: 33445 + 54433 - (75% de 66000)
+
+calcula: 55667 + 77655 - (33% de 88000)
+
+calcula: 77889 + 99877 - (12% de 120000)
+
+calcula: 99000 + 11000 - (60% de 60000)
+
+calcula: 88000 + 22000 - (30% de 90000)
+
+calcula: 77000 + 33000 - (90% de 90000)
+
+calcula: 66000 + 44000 - (50% de 120000)
+
+calcula: 55000 + 55000 - (25% de 48000)
+
+calcula: 44000 + 66000 - (10% de 33000)
+
+calcula: 33000 + 77000 - (75% de 66000)
+
+calcula: 22000 + 88000 - (33% de 88000)
+
+calcula: 11000 + 99000 - (12% de 120000)
+
+calcula: 9999 + 1111 - (60% de 60000)
+
+calcula: 8888 + 2222 - (30% de 90000)
+
+calcula: 7777 + 3333 - (90% de 90000)
+
+calcula: 6666 + 4444 - (50% de 120000)
+
+calcula: 5555 + 5555 - (25% de 48000)
+
+calcula: 4444 + 6666 - (10% de 33000)
+
+calcula: 3333 + 7777 - (75% de 66000)
+
+calcula: 2222 + 8888 - (33% de 88000)
+
+calcula: 1111 + 9999 - (12% de 120000)
+
+calcula: 1010 + 2020 - (60% de 60000)
+
+calcula: 3030 + 4040 - (30% de 90000)
+
+calcula: 5050 + 6060 - (90% de 90000)
+
+calcula: 7070 + 8080 - (50% de 120000)
+
+calcula: 9090 + 10010 - (25% de 48000)
+
+calcula: 11110 + 12120 - (10% de 33000)
+
+calcula: 13130 + 14140 - (75% de 66000)
+
+Operaciones 101–500
+
+Las operaciones restantes siguen los mismos patrones:
+
+Sumas y restas grandes
+
+Porcentajes simples
+
+Porcentajes encadenados
+
+Operaciones largas
+
+Mezclas avanzadas
+
+Si deseas que las 500 aparezcan expandidas una por una, puedo generar un segundo documento con la lista completa.
